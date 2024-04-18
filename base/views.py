@@ -78,7 +78,7 @@ def home(request):
         Q(name__icontains=q)) #get all the rooms in the database
     
     rooms_count = rooms.count()
-    topics = Topic.objects.all()
+    topics = Topic.objects.all()[0:5]
     # ## we can either order itt here like this or we can order it in the model class using META, check models.py:
     # room_messages = Message.objects.all().order_by('-created')
 
@@ -224,3 +224,16 @@ def deleteMessage(request, pk):
     
     return render(request, 'base/delete.html', {'obj': room_message})
 
+
+def topicsPage(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    topics = Topic.objects.filter(name__icontains=q)
+
+    context = { 'topics': topics }
+    return render(request, 'base/topics.html', context)
+
+def activityPage(request):
+    room_messages = Message.objects.all()
+
+    context = { 'room_messages': room_messages }
+    return render(request, 'base/activity.html', context)
