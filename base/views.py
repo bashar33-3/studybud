@@ -119,6 +119,9 @@ def userProfile(request, pk):
              'rooms_count': rooms_count}
     return render(request, 'base/profile.html', context)
 
+def updateProfile(request):
+    return render(request, 'base/edit-user.html')
+
 
 @login_required(login_url='login')
 def createRoom(request):
