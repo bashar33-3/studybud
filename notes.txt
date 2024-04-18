@@ -1,0 +1,168 @@
+first of all create the virtual environment 
+
+activate the environment in the terminal with .venv\scripts\activate
+if not allowed run:       Set-ExecutionPolicy RemoteSigned 
+
+then install django pip install django 
+and now we are set with our environment,, every time we open the project we activate the environment
+
+now we need to start the project with command : django-admin startproject "name of the project"
+
+to run the server, cd into the project directory and command  python manage.py runserver
+
+
+keep the server running with one terminal and add another terminal to create the base app
+
+create the base app with command python manage.py startapp base
+
+go to main project created with django-admin startproject "name of the project" and add 'base' to INSTALLED_APPS to connect base with the project
+
+
+Templates:
+when we add a template folder in the project, we need to let django know that we added the folder 
+to link the templates folder go to settings.py ----> TEMPLATES 
+        'DIRS': [
+            BASE_DIR / 'templates'
+        ],
+
+to render the template:
+def home(request):
+    return render(request, 'home.html')
+
+it is better practice if we create two templates folder, the first one as we did above 
+it would contain the templates that we will render in generally and the second on specific to the templates we want to render for the app
+so we create the templates specific folder in the app in our case the app is called base:
+base/templates/base base inside templates also and then the html templates
+now to connect the templates to the page:
+def home(request):
+    context = {'rooms': rooms}
+    return render(request, 'base/home.html', context)
+
+
+
+
+How to pass variables?
+Almost most of the logic is built in base app views.py
+rooms =[
+    {'id':1, 'name':'Lets learn Python'},
+    {'id':2, 'name':'Design with me'},
+    {'id':3, 'name':'Frontend devs'},
+]
+
+def home(request):
+    return render(request, 'home.html', {'rooms': rooms})
+
+in the dictionary the key is how we want to address it in the template and the value is the variable name
+
+also it is better if we create a context var and pass it instead of passing a dictionary
+def home(request):
+    context = {'rooms', rooms}
+    return render(request, 'home.html', context)
+
+
+Dynamic URL Routing:
+inside urls.py in the base app this is how you pass a variable <type:name>
+urlpatterns = [
+    path('', views.home, name="home"),
+    path('room/<str:pk>/', views.room, name="room"),
+]
+
+and then inside views.py in the base app we pass it like this 
+def room(request, pk):
+    return render(request, 'base/room.html')
+
+and to link it in the template :
+    <div>
+            <h5>{{room.id}} -- <a href="{% url 'room' room.id %}">{{room.name}}</a></h5>
+    </div>
+
+    {% url 'name of route' variable passed %}
+
+
+DATABASE prep and Query:
+first of all we need to activate the premade databases from django and to do that we turn off the server if it is on and then we command: python manage.py runserver
+
+then we need to work in base app models.py to create the tables
+everytime we add a model to the database we need to do migration with command python manage.py makemigrations and then command: python manage.py migrate
+
+
+The way to query from the database :
+
+queryset = ModelName.objects.all() .get() .filter() .exclude()
+
+queryset: variable that holds the response 
+ModelName: Model name 
+objects: Model object attribute like (name, id ... )
+.all : gets all
+.get(): gets single obj 
+
+
+
+
+ADMIN PANEL ACTIVATION:
+to be able to login in the admin dashboard we need to initialize the username and password from the terminal with command:
+python manage.py createsuperuser 
+
+
+FORMS  and CRUD operations
+
+in every form we need to include
+{% csrf_token %}
+
+to create django form first create forms.py in base app folder and then:
+from django.forms import ModelForm
+and then import the model you want to create a form for from the app models in models.py :
+from .models import Room
+
+now to use the form and render it we need to import it into views to pass it to the route
+
+This is how we prefill a form with values
+form = RoomForm(instance=room)
+ALSO ADD instance IN FORM POST REQUEST 
+    if request.method == "POST":
+        form = RoomForm(request.POST, instance=room)
+
+for the DELETE request it is better to make a form for the delete  in a seperate template to use it on several delete forms// also the action can empty with the request it will do. since no values to send 
+<form method="POST" action="">
+    {%csrf_token%}
+    <p>Are you sure you want to delete? "{{obj}}" ?</p>
+    <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
+    <input type="submit" value="Confirm">
+</form>
+
+
+Search Forms:
+review navbar and home in views.py for search implementation 
+
+
+
+Static Files Config 
+first we create a folder in the project directory called static 
+inside we create images folder, styles folder 
+inside styles we could create main.css folder
+Now we need django to know that we created the static folder
+we go to project settings.py
+we craete a variable just under STATIC_URL and we call it:
+
+STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
+then in the main.html template we add 
+{%load static%} in the beginning up and then 
+<link rel="stylesheet" media="screen" type="text/css" href="{%static 'styles/main.css'%}">
+
+and for images normally we do 
+<img src="{%static 'images/blog1.jpg'%}" alt="">
+
+however for user uploaded images we need to configure it by adding to the above:
+
+STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
+STATIC_ROOT = 
