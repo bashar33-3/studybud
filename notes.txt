@@ -80,7 +80,7 @@ and to link it in the template :
 
 
 DATABASE prep and Query:
-first of all we need to activate the premade databases from django and to do that we turn off the server if it is on and then we command: python manage.py runserver
+first of all we need to activate the premade databases from django and to do that we turn off the server if it is on and then we command: python manage.py migrate
 
 then we need to work in base app models.py to create the tables
 everytime we add a model to the database we need to do migration with command python manage.py makemigrations and then command: python manage.py migrate
@@ -166,3 +166,40 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = 
+
+
+
+USER MODEL CUSTOMIZATION:
+For customizing the user model if we are starting a fresh project
+create venv
+
+install django 
+
+start the project django-admin startproject projectname
+
+create the app python manage.py startapp base
+
+create user model in models --->
+from django.contrib.auth.models import AbstractUser
+class User(AbstractUser):
+    pass
+
+change settings.py:
+under INSTALLED_APPS add --->
+AUTH_USER_MODEL = 'base.User'
+
+
+make migrations:
+run python manage.py makemigration
+run python manage.py migrate
+
+create super user:
+python mange.py createsuperuser
+
+register user in admin.py in base app
+from .models import User
+admin.site.register(User)
+
+now for customizing the model we do it in models.py User 
+
+NOW IF WE ALREADY IN THE MIDDLE OF THE PROJECT OR END AND WE WANT TO CUSTOMIZE THE USER MODEL
